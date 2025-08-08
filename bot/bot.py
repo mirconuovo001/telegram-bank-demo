@@ -40,3 +40,28 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+import asyncio
+from aiohttp import web
+
+async def handle(request):
+    return web.Response(text="ok")
+
+async def health(request):
+    return web.Response(text="healthy")
+
+app = web.Application()
+app.router.add_get("/", handle)
+app.router.add_get("/health", health)
+
+loop = asyncio.get_event_loop()
+
+# Avvia sia il bot sia il mini server HTTP
+async def main():
+    from aiogram import executor
+    loop.create_task(web._run_app(app, host="0.0.0.0", port=10000))
+    executor.start_polling(dp, skip_updates=True)
+
+if __name__ == "__main__":
+    loop.run_until_complete(main())
+
